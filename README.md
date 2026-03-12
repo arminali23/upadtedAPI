@@ -1,92 +1,152 @@
-# SOHMA Placeholder AI Model (Integration Test)
+# SOHMA Model API (Integration Test)
 
-This is a minimal AI model API created for validating the end-to-end integration between:
+This repository contains a lightweight API used to test the integration
+between the Sokoban game telemetry system and an AI model for emotion
+classification.
 
-Sokoban Game → SDK → AI Model → JSON Output
+The goal of this project is to validate the **end-to-end pipeline**
+between the game, the telemetry data format, and an AI inference service
+before deploying the final production model.
 
-This version is **internal only** and intended for rapid integration testing.
+------------------------------------------------------------------------
 
----
+## Overview
+
+The API receives Sokoban gameplay telemetry in JSON format, builds a
+prompt from the game metrics, runs an AI model locally, and returns an
+emotion prediction.
+
+Pipeline:
+
+Game telemetry JSON → Prompt builder → AI model → Emotion prediction
+JSON → API response
+
+This implementation is intended for **internal development and
+integration testing only**.
+
+------------------------------------------------------------------------
+
+## Current Features
+
+-   FastAPI based local API
+-   Accepts Sokoban telemetry JSON
+-   Converts telemetry metrics into a structured prompt
+-   Runs a local LLM for emotion classification
+-   Returns structured JSON output
+-   Compatible with Apple Silicon (MPS acceleration)
+
+------------------------------------------------------------------------
+
+## API Endpoints
+
+### Root
+
+GET /
+
+Returns service status.
+
+Example response:
+
+{ "ok": true, "service": "sohma_api" }
+
+------------------------------------------------------------------------
+
+### Health Check
+
+GET /healthz
+
+Used to verify that the API is running.
+
+------------------------------------------------------------------------
+
+### Prediction Endpoint
+
+POST /predict
+
+Receives gameplay telemetry and returns an emotion prediction.
+
+Example request body:
+
+{ "session_id": "LOCAL_TEST_001", "raw_signals": { "window_ms": 5000,
+"move_count": 25, "wrong_direction_count": 4, "repeated_move_count": 2,
+"boxes_stuck_in_window": 3, "undos_in_window": 2, "idle_time_ms": 1500,
+"avg_time_between_moves_ms": 200, "timing_std_ms": 100,
+"boxes_on_target_delta": -2 } }
+
+Example response:
+
+{ "session_id": "LOCAL_TEST_001", "timestamp": "...", "prediction": {
+"Emotion": "Stress", "Intensity": "High" } }
+
+------------------------------------------------------------------------
+
+## Running the API
+
+1.  Create a virtual environment
+
+python -m venv .venv\
+source .venv/bin/activate
+
+2.  Install dependencies
+
+pip install -r requirements.txt
+
+3.  Start the API
+
+python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+
+4.  Open the interactive API documentation
+
+http://127.0.0.1:8000/docs
+
+------------------------------------------------------------------------
+
+## Model
+
+The API currently supports running a local instruction-tuned language
+model for emotion classification.
+
+Models being tested include:
+
+-   Mistral-7B-Instruct
+-   Qwen-2.5-Instruct (lighter alternative for local testing)
+
+The model converts gameplay metrics into a structured emotion
+classification response.
+
+------------------------------------------------------------------------
 
 ## Purpose
 
-- Validate JSON data flow from Unity SDK to AI model
-- Return structured JSON output
-- Derive at least one computed value from input (stress score)
-- No production logic
-- No real ML model (placeholder deterministic logic)
+This API is designed to support the **initial integration test**
+between:
 
----
+-   Sokoban game telemetry
+-   SDK communication
+-   AI inference service
 
-## Tech Stack
+The goal is to validate:
 
-- FastAPI
-- Uvicorn
-- Python 3.10+
+-   JSON data flow
+-   API communication
+-   model response format
+-   integration with the game engine
 
----
+before deploying the final hosted model.
 
-## Installation
+------------------------------------------------------------------------
 
-```bash
-git clone git clone https://github.com/arminali23/sohma_api.git
-cd sohma_api
-pip install -r requirements.txt
-```
+## Future Work
 
-Run the API 
+-   Deploy model on shared server
+-   Evaluate model latency and output consistency
+-   Compare performance across different models
+-   Integrate with the Unity SDK pipeline
+-   Add logging for adaptation decisions
 
-```bash
-uvicorn app:app --host 0.0.0.0 --port 8000
-```
+------------------------------------------------------------------------
 
-Server runs on 
+## Author
 
-```bash
-http://localhost:8000
-```
-
-# Endpoints
-
-Health Check
-
-```bash
-GET /healthz
-```
-
-Returns: 
-
-```bash
-{"ok": true}
-```
-
-Predict Endpoint (Integration Test)
-
-```bash
-POST /predict
-```
-
-Example: 
-
-```bash
-curl -X POST http://localhost:8000/predict \
--H "Content-Type: application/json" \
--d @sample_input.json
-```
-
-# What the Model Does
-
-From Sokoban raw signals, it calculates:
-- Interaction intensity
-- Error rate
-- Pause frequency
-- Temporal instability
-- Stress score (derived from intensity + error rate)
-
-This allows us to test:
-- SDK → API connection
-- JSON schema compatibility
-- Derived metric logic
-- End-to-end data validation
-
-  
+Armin Ali\
+SOHMA AI -- AI/ML Development
