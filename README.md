@@ -1,4 +1,4 @@
-# SOHMA Model API (Integration Test)
+# Model API (Integration Test)
 
 This repository contains a lightweight API used to test the integration
 between the Sokoban game telemetry system and an AI model for emotion
