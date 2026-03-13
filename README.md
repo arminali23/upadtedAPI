@@ -59,27 +59,6 @@ Used to verify that the API is running.
 
 ------------------------------------------------------------------------
 
-### Prediction Endpoint
-
-POST /predict
-
-Receives gameplay telemetry and returns an emotion prediction.
-
-Example request body:
-
-{ "session_id": "LOCAL_TEST_001", "raw_signals": { "window_ms": 5000,
-"move_count": 25, "wrong_direction_count": 4, "repeated_move_count": 2,
-"boxes_stuck_in_window": 3, "undos_in_window": 2, "idle_time_ms": 1500,
-"avg_time_between_moves_ms": 200, "timing_std_ms": 100,
-"boxes_on_target_delta": -2 } }
-
-Example response:
-
-{ "session_id": "LOCAL_TEST_001", "timestamp": "...", "prediction": {
-"Emotion": "Stress", "Intensity": "High" } }
-
-------------------------------------------------------------------------
-
 ## Running the API
 
 1.  Create a virtual environment
@@ -113,6 +92,9 @@ Models being tested include:
 
 The model converts gameplay metrics into a structured emotion
 classification response.
+
+- According to the tests qwen-3b did not give the exact emotions that we wanted. On the other hand, mistral-7b performed much efficient in terms of our use cases.
+- Hence, use "mistralai/Mistral-7B-Instruct-v0.2" in model_id (can be found in model_runtime.py)
 
 ------------------------------------------------------------------------
 
